@@ -1,0 +1,35 @@
+name: Reset data IoT harian
+
+on:
+  schedule:
+    - cron: "0 17 * * *"   # 17:00 UTC = 00:00 WIB (tiap tengah malam)
+  workflow_dispatch:       # tombol "Run workflow" untuk uji manual
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login lalu hapus semua data kecelakaan
+        env:
+          API_KEY:  ${{ secrets.FIREBASE_API_KEY }}
+          DB_URL:   ${{ secrets.FIREBASE_DB_URL }}
+          EMAIL:    ${{ secrets.CLEANER_EMAIL }}
+          PASSWORD: ${{ secrets.CLEANER_PASSWORD }}
+        run: |
+          set -e
+          DB_URL="${DB_URL%/}"
+
+          BODY=$(jq -n --arg e "$EMAIL" --arg p "$PASSWORD" \
+                 '{email:$e, password:$p, returnSecureToken:true}')
+
+          TOKEN=$(curl -s -f -X POST \
+            "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$API_KEY" \
+            -H "Content-Type: application/json" -d "$BODY" | jq -r '.idToken')
+
+          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+            echo "Login gagal, cek secret CLEANER_EMAIL / CLEANER_PASSWORD"
+            exit 1
+          fi
+
+          curl -s -f -X DELETE "$DB_URL/kecelakaan.json?auth=$TOKEN"
+          echo "Data kecelakaan sudah direset"
