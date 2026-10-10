@@ -18,6 +18,17 @@ const status = teks => { if ($("status")) $("status").textContent = teks; };
 // Ganti jadi ", " jika ingin dipisah koma.
 const SEP = " ";
 
+// ======================================================
+// KONFIGURASI FIREBASE (isi dengan data dari proyek Anda)
+// Firebase Console > Project settings > Your apps > Web app
+// ======================================================
+const FIREBASE_CONFIG = {
+  apiKey: "ISI_API_KEY",
+  authDomain: "ISI_PROJECT_ID.firebaseapp.com",
+  databaseURL: "ISI_DATABASE_URL",   // contoh: https://nama-proyek-default-rtdb.asia-southeast1.firebasedatabase.app
+  projectId: "ISI_PROJECT_ID"
+};
+
 // ---------- Validasi & ambil data ----------
 function validKoordinat(lat, lon) {
   return Number.isFinite(lat) && Number.isFinite(lon) &&
@@ -177,6 +188,97 @@ function bacaKoordinat() {
   return [bagian[0], bagian[1]];
 }
 
+// ======================================================
+// PANEL IoT: terima koordinat dari perangkat lewat Firebase
+// ======================================================
+function statusIot(teks, kelas) {
+  const el = $("iotStatus");
+  if (!el) return;
+  el.textContent = teks;
+  el.className = "iot-status" + (kelas ? " " + kelas : "");
+}
+
+function pakaiLaporan(lat, lon) {
+  $("koordinat").value = lat + ", " + lon;
+  proses(lat, lon);
+}
+
+function tambahLaporan(key, data, baru) {
+  // Data dari perangkat tidak dipercaya: validasi dulu, tulis dengan textContent (bukan innerHTML)
+  const lat = Number(data && data.lat);
+  const lon = Number(data && data.lon);
+  if (!validKoordinat(lat, lon)) return;
+
+  const li = document.createElement("li");
+  li.dataset.key = key;
+  if (baru) li.className = "baru";
+
+  const nama = document.createElement("div");
+  nama.className = "perangkat";
+  nama.textContent = String((data && data.device) || "Perangkat tanpa nama").slice(0, 40);
+
+  const waktu = document.createElement("div");
+  waktu.className = "waktu";
+  waktu.textContent = data && data.waktu
+    ? new Date(data.waktu).toLocaleString("id-ID")
+    : "Waktu tidak diketahui";
+
+  const koor = document.createElement("div");
+  koor.className = "koor";
+  koor.textContent = lat + ", " + lon;
+
+  const tombol = document.createElement("button");
+  tombol.type = "button";
+  tombol.textContent = "Pakai koordinat ini";
+  tombol.addEventListener("click", () => pakaiLaporan(lat, lon));
+
+  li.append(nama, waktu, koor, tombol);
+
+  const daftar = $("daftarIot");
+  daftar.prepend(li);                       // terbaru di atas
+  while (daftar.children.length > 20) daftar.lastChild.remove();
+  if ($("iotKosong")) $("iotKosong").style.display = "none";
+
+  if (baru && $("otomatis") && $("otomatis").checked) pakaiLaporan(lat, lon);
+}
+
+// Hapus laporan dari panel saat datanya dihapus di server (reset harian)
+function hapusLaporan(key) {
+  const daftar = $("daftarIot");
+  [...daftar.children].forEach(li => { if (li.dataset.key === key) li.remove(); });
+  if (!daftar.children.length && $("iotKosong")) $("iotKosong").style.display = "";
+}
+
+// Laporan hanya ditampilkan jika umurnya kurang dari 24 jam
+const BATAS_JAM = 24;
+
+function mulaiIot() {
+  if (typeof firebase === "undefined") {
+    statusIot("Firebase gagal dimuat (cek internet)", "off");
+    return;
+  }
+  if (FIREBASE_CONFIG.apiKey.startsWith("ISI")) {
+    statusIot("Belum dikonfigurasi (isi FIREBASE_CONFIG di app.js)", "off");
+    return;
+  }
+
+  firebase.initializeApp(FIREBASE_CONFIG);
+  const db = firebase.database();
+
+  db.ref(".info/connected").on("value", s =>
+    s.val() ? statusIot("Terhubung ke server", "on")
+            : statusIot("Terputus dari server", "off"));
+
+  const batasAwal = Date.now() - BATAS_JAM * 60 * 60 * 1000;
+  const ref = db.ref("kecelakaan").orderByChild("waktu").startAt(batasAwal).limitToLast(20);
+  let awalSelesai = false;
+
+  // Data lama dimuat dulu; laporan yang datang sesudahnya ditandai "baru"
+  ref.on("child_added", snap => tambahLaporan(snap.key, snap.val(), awalSelesai));
+  ref.on("child_removed", snap => hapusLaporan(snap.key));
+  ref.once("value", () => { awalSelesai = true; });
+}
+
 // ---------- Tombol ----------
 klik("cari", () => proses(...bacaKoordinat()));
 
@@ -250,3 +352,6 @@ klik("go", () => {
   }
   status("Membuka Google Maps...");
 });
+
+// Jalankan koneksi IoT saat halaman dibuka
+mulaiIot();
