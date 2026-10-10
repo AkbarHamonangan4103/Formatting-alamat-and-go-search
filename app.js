@@ -23,10 +23,10 @@ const SEP = " ";
 // Firebase Console > Project settings > Your apps > Web app
 // ======================================================
 const FIREBASE_CONFIG = {
-  apiKey: "ISI_API_KEY",
-  authDomain: "ISI_PROJECT_ID.firebaseapp.com",
-  databaseURL: "ISI_DATABASE_URL",   // contoh: https://nama-proyek-default-rtdb.asia-southeast1.firebasedatabase.app
-  projectId: "ISI_PROJECT_ID"
+  apiKey: "AIzaSyAykuFu2RNOHMWbgwpsbMochIpt8Os_WWI",
+  authDomain: "formatting-alamat-iot.firebaseapp.com",
+  databaseURL: "https://formatting-alamat-iot-default-rtdb.asia-southeast1.firebasedatabase.app",   // contoh: https://nama-proyek-default-rtdb.asia-southeast1.firebasedatabase.app
+  projectId: "formatting-alamat-iot"
 };
 
 // ---------- Validasi & ambil data ----------
