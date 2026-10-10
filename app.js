@@ -353,5 +353,27 @@ klik("go", () => {
   status("Membuka Google Maps...");
 });
 
+// Mode translucent (kaca buram), pilihan diingat di browser
+(function () {
+  const tombol = $("modeGlass");
+  if (!tombol) return;
+
+  function terapkan(aktif) {
+    document.body.classList.toggle("glass", aktif);
+    tombol.textContent = "Mode Translucent: " + (aktif ? "Hidup" : "Mati");
+    tombol.setAttribute("aria-pressed", String(aktif));
+  }
+
+  let aktif = false;
+  try { aktif = localStorage.getItem("modeGlass") === "1"; } catch (e) {}
+  terapkan(aktif);
+
+  tombol.addEventListener("click", () => {
+    aktif = !aktif;
+    terapkan(aktif);
+    try { localStorage.setItem("modeGlass", aktif ? "1" : "0"); } catch (e) {}
+  });
+})();
+
 // Jalankan koneksi IoT saat halaman dibuka
 mulaiIot();

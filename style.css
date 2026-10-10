@@ -106,6 +106,63 @@ label.cek input { width: auto; margin: 0; }
 .daftar-iot .koor { font-family: monospace; margin: 6px 0; word-break: break-all; }
 .daftar-iot button { padding: 6px 12px; font-size: 0.85rem; }
 
+/* ---------- Tombol mode translucent ---------- */
+.toggle-mode {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  background: #444;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.toggle-mode:hover { background: #222; }
+
+/* ---------- MODE TRANSLUCENT (kaca buram) ---------- */
+body { transition: background 0.3s; }
+
+body.glass {
+  background:
+    radial-gradient(circle at 15% 20%, #8ec5fc 0, transparent 45%),
+    radial-gradient(circle at 85% 15%, #e0c3fc 0, transparent 45%),
+    radial-gradient(circle at 70% 90%, #ffd1a9 0, transparent 45%),
+    #dfe6f5;
+  background-attachment: fixed;
+}
+
+body.glass main,
+body.glass .panel-iot {
+  background: rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.18);
+}
+
+body.glass input,
+body.glass textarea {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+body.glass .daftar-iot li {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+body.glass .daftar-iot li.baru {
+  background: rgba(255, 235, 232, 0.7);
+  border-color: #ea4335;
+}
+
+body.glass .toggle-mode { background: rgba(30, 30, 30, 0.75); }
+
+/* Browser lama tanpa dukungan blur: pakai latar lebih pekat agar tetap terbaca */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  body.glass main,
+  body.glass .panel-iot { background: rgba(255, 255, 255, 0.85); }
+}
+
 /* ---------- HP / layar sempit ---------- */
 @media (max-width: 1000px) {
   .layout { grid-template-columns: 1fr; }
