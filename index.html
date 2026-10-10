@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formatting Alamat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Formatting Alamat dari Koordinat</h1>
+    <p class="info">Simbol yang diizinkan: ( . , / -</p>
+
+    <label for="koordinat">Koordinat (paste dari Google Maps)</label>
+    <input id="koordinat" placeholder="-7.795600, 110.369500">
+
+    <div class="tombol">
+      <button id="cari" type="button">Cari Alamat</button>
+      <button id="lokasi" type="button">Pakai Lokasi Saya</button>
+    </div>
+    <p id="status"></p>
+
+    <h2>Data Alamat (bisa diedit)</h2>
+
+    <label>Nama Perumahan / Kluster / Apartemen / Mall</label>
+    <input id="perumahan">
+
+    <label>Nama Desa / Tempat</label>
+    <input id="desa">
+
+    <label>Nama Jalan (tanpa kata "Jl.")</label>
+    <input id="jalan">
+
+    <div class="baris">
+      <div><label>No.</label><input id="no"></div>
+      <div><label>Gang (tanpa "Gg.")</label><input id="gang"></div>
+    </div>
+
+    <div class="baris">
+      <div><label>RT</label><input id="rt"></div>
+      <div><label>RW</label><input id="rw"></div>
+    </div>
+
+    <label>Kelurahan</label>
+    <input id="kel">
+
+    <label>Kecamatan</label>
+    <input id="kec">
+
+    <div class="baris">
+      <div><label>Kabupaten</label><input id="kab"></div>
+      <div><label>Kota</label><input id="kota"></div>
+    </div>
+
+    <div class="baris">
+      <div><label>Provinsi</label><input id="prov"></div>
+      <div><label>Kode Pos</label><input id="pos"></div>
+    </div>
+
+    <label>Additional (dari kode pos online)</label>
+    <input id="additional" placeholder="Kode pos 55573, Jogo Tirto, Berbah, Kab. Sleman, DI Yogyakarta, Indonesia">
+    <div class="tombol">
+      <button id="cariPos" type="button">Cari dari Kode Pos</button>
+    </div>
+
+    <label>Patokan (pisahkan dengan koma)</label>
+    <input id="patokan" placeholder="Depan Indomaret, Samping Masjid">
+
+    <div class="tombol">
+      <button id="buat" type="button">Buat Alamat</button>
+    </div>
+
+    <label for="hasil">Hasil Alamat</label>
+    <textarea id="hasil" rows="5" readonly></textarea>
+
+    <div class="tombol">
+      <button id="salin" type="button" class="hijau">Salin</button>
+      <button id="go" type="button" class="merah">Go ke Google Maps</button>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
